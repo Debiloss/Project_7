@@ -1,18 +1,14 @@
 mlflow==2.2.2
-
-Pandas~=1.5.3
+Pandas==1.5.3
 FastAPI == 0.92.0
 Pydantic == 1.10.2
 uvicorn == 0.20.0
 Shap == 0.41.0
-
-streamlit~=1.20.0
-plotly~=5.13.1
-matplotlib~=3.7.1
-seaborn~=0.12.2
-requests~=2.28.2
-names~=0.3.0
-altair~=4.2.2
-lightgbm~=3.3.5
-scikit-learn~=1.2.2
-numpy~=1.24.2
+streamlit==1.20.0
+plotly==5.13.1
+matplotlib==3.7.1
+requests==2.28.2
+names==0.3.0
+altair==4.2.2
+scikit-learn==1.2.2
+numpy==1.24.2
