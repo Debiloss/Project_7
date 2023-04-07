@@ -124,6 +124,12 @@ def columns():
     return new_test_info["CODE_GENDER"].head(N_CUSTOMERS).to_json()
 
 
+@app.get('/education')
+def columns():
+    """ Return the customers gender """
+    return new_test_info["NAME_EDUCATION_TYPE"].head(N_CUSTOMERS).to_json()
+
+
 @app.get('/age')
 def columns():
     """ Return the customers age """
@@ -140,6 +146,18 @@ def columns():
 def columns():
     """ Return the customers payment rate """
     return new_test_info["PAYMENT_RATE"].head(N_CUSTOMERS).to_json()
+
+
+@app.get('/credit_perc')
+def columns():
+    """ Return the customers income credit percent """
+    return new_test_info["INCOME_CREDIT_PERC"].head(N_CUSTOMERS).to_json()
+
+
+@app.get('/income_perc')
+def columns():
+    """ Return the customers income credit percent """
+    return new_test_info["ANNUITY_INCOME_PERC"].head(N_CUSTOMERS).to_json()
 
 
 # Retourne un tableau avec les colonnes principales pour un client donné

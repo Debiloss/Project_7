@@ -46,6 +46,14 @@ def get_gender():
 
 
 @st.cache_data
+def get_education():
+    """ Get education type of customers """
+    response = requests.get(API_URL + "education/", timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
+@st.cache_data
 def get_age():
     """ Get age of customers """
     response = requests.get(API_URL + "age/", timeout=TIMEOUT)
@@ -65,6 +73,22 @@ def get_income():
 def get_payment():
     """ Get income of customers """
     response = requests.get(API_URL + "payment/", timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
+@st.cache_data
+def get_credit_perc():
+    """ Get income credit perc of customers """
+    response = requests.get(API_URL + "credit_perc/", timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
+@st.cache_data
+def get_income_perc():
+    """ Get income perc of customers """
+    response = requests.get(API_URL + "income_perc/", timeout=TIMEOUT)
     content = json.loads(json.loads(response.content))
     return pd.Series(content)
 
@@ -229,20 +253,10 @@ with tab_inf:
     st.bar_chart(data=df, use_container_width=True)
     st.write("")
 
-    st.subheader("Informations Age")
-    df1 = get_age()
-    fig, ax = plt.subplots()
-    ax.hist(df1, bins=20)
-    plt.xlabel('AGE', fontsize=12)
-    st.pyplot(fig)
-    st.write("")
-
-    st.subheader("Informations Income")
-    df2 = get_income()
-    fig, ax = plt.subplots()
-    ax.hist(df2, bins=20)
-    plt.xlabel('Income', fontsize=12)
-    st.pyplot(fig)
+    st.subheader("Informations Education")
+    df1 = get_education().value_counts()
+    df1 = df1.rename('Education')
+    st.bar_chart(data=df1, use_container_width=True)
     st.write("")
 
     st.subheader("Informations Income/Age/Gender")
@@ -259,8 +273,77 @@ with tab_inf:
         color="Gender",
     ).interactive()
     st.altair_chart(chart, theme="streamlit", use_container_width=True)
+    st.write("")
 
-    st.subheader("Informations Payment/Age/Gender")
+    st.subheader("Informations Income/Age/Gender/Education/Payment")
+    df_gender = get_gender()
+    df_age = get_age()
+    df_income = get_income()
+    df_education = get_education()
+    df_payment = get_payment()
+    source = pd.DataFrame(columns=['Gender', 'Income', 'Age', 'Education', 'Payment'])
+    source['Gender'] = df_gender
+    source['Income'] = df_income
+    source['Age'] = df_age
+    source['Education'] = df_education
+    source['Payment'] = df_payment*5
+
+    scale = alt.Scale(
+        domain=["M", "F"],
+        range=["#9467bd", "#1f77b4"],
+    )
+    color = alt.Color("Gender:N", scale=scale)
+    brush = alt.selection_interval(encodings=["x"])
+    click = alt.selection_multi(encodings=["color"])
+
+    points = (
+        alt.Chart()
+        .mark_point()
+        .encode(
+            alt.X("Income:N", title="Income total"),
+            alt.Y(
+                "Age:Q",
+                title="Age",
+                scale=alt.Scale(domain=[20, 70]),
+            ),
+            color=alt.condition(brush, color, alt.value("lightgray")),
+            size=alt.Size("Payment:Q", scale=alt.Scale(range=[15, 65])),
+        )
+        .properties(width=550, height=300)
+        .add_selection(brush)
+        .transform_filter(click)
+    )
+
+    bars = (
+        alt.Chart()
+        .mark_bar()
+        .encode(
+            x="count()",
+            y="Education:N",
+            color=alt.condition(click, color, alt.value("lightgray")),
+        )
+        .transform_filter(brush)
+        .properties(
+            width=550,
+        )
+        .add_selection(click)
+    )
+
+    chart = alt.vconcat(points, bars, data=source, title="Information Customers")
+
+    st.altair_chart(chart, theme="streamlit", use_container_width=True)
+
+    st.subheader("Informations Perc")
+    df_perc = pd.DataFrame(columns=["Income/Credit", "Annuity/Income", "Payment"])
+    df_perc["Income/Credit"] = get_credit_perc()
+    df_perc["Annuity/Income"] = get_income_perc()
+    df_perc["Payment"] = get_payment()
+    cust_names = create_customer_names(df_perc.shape[0])
+    df_perc.index = cust_names
+    st.line_chart(df_perc)
+    st.write("")
+
+    st.subheader("Informations")
 
 
 with tab_all:
