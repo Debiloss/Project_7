@@ -20,15 +20,15 @@ df_test = pd.read_csv(
 # Load dataset modifié
 df_test_modif = pd.read_csv(r"C:\Users\Sofia\OneDrive\Documents\OpenClassrooms\Project_7\Python\new_test.csv")
 
+# Load dataset information
+df_test_info = pd.read_csv(r"C:\Users\Sofia\OneDrive\Documents\OpenClassrooms\Project_7\Python\test_info.csv")
+
 N_CUSTOMERS = 1000
 N_NEIGHBORS = 20
-MAIN_COLUMNS = ['SK_ID_CURR', 'CODE_GENDER', 'FLAG_OWN_CAR', 'FLAG_OWN_REALTY', 'CNT_CHILDREN',
-                'NAME_FAMILY_STATUS', 'NAME_INCOME_TYPE',
-                'AMT_INCOME_TOTAL',
-                'DAYS_BIRTH', 'DAYS_EMPLOYED']
 
 MAIN_COLUMNS_1 = ['SK_ID_CURR', 'CODE_GENDER', 'FLAG_OWN_CAR', 'FLAG_OWN_REALTY', 'CNT_CHILDREN', 'NAME_FAMILY_STATUS',
                   'NAME_INCOME_TYPE', 'INCOME_CREDIT_PERC', 'ANNUITY_INCOME_PERC', 'DAYS_BIRTH', 'DAYS_EMPLOYED']
+
 
 col = ['NAME_CONTRACT_TYPE', 'CODE_GENDER', 'FLAG_OWN_CAR',
        'FLAG_OWN_REALTY', 'CNT_CHILDREN', 'DAYS_EMPLOYED_PERC', 'INCOME_CREDIT_PERC',
@@ -99,6 +99,7 @@ def prep_data_modif(data, n_neigbhors, n_customers):
 # Prepare the reduced data and shap values
 new_test = prep_data(df_test, N_CUSTOMERS)
 new_test_modif, neighbors_indices, shap_values = prep_data_modif(df_test_modif, N_NEIGHBORS, N_CUSTOMERS)
+new_test_info = prep_data(df_test_info, N_CUSTOMERS)
 
 
 # 3. Index route, opens automatically on http://127.0.0.1:8000
@@ -115,6 +116,30 @@ def home():
 def ids():
     """ Return the customers ids """
     return {'ids': new_test.head(N_CUSTOMERS).index.to_list()}
+
+
+@app.get('/gender')
+def columns():
+    """ Return the customers gender """
+    return new_test_info["CODE_GENDER"].head(N_CUSTOMERS).to_json()
+
+
+@app.get('/age')
+def columns():
+    """ Return the customers age """
+    return new_test_info["AGE"].head(N_CUSTOMERS).to_json()
+
+
+@app.get('/income')
+def columns():
+    """ Return the customers income total """
+    return new_test_info["AMT_INCOME_TOTAL"].head(N_CUSTOMERS).to_json()
+
+
+@app.get('/payment')
+def columns():
+    """ Return the customers payment rate """
+    return new_test_info["PAYMENT_RATE"].head(N_CUSTOMERS).to_json()
 
 
 # Retourne un tableau avec les colonnes principales pour un client donné

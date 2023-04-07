@@ -37,6 +37,38 @@ def get_cust_ids():
     return content['ids']
 
 
+@st.cache_data
+def get_gender():
+    """ Get gender of customers """
+    response = requests.get(API_URL + "gender/", timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
+@st.cache_data
+def get_age():
+    """ Get age of customers """
+    response = requests.get(API_URL + "age/", timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
+@st.cache_data
+def get_income():
+    """ Get income of customers """
+    response = requests.get(API_URL + "income/", timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
+@st.cache_data
+def get_payment():
+    """ Get income of customers """
+    response = requests.get(API_URL + "payment/", timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
 # Retourne les colonnes principales pour un client donné
 @st.cache_data
 def get_cust_columns(cust_id):
@@ -187,9 +219,50 @@ feat_imp_source = st.sidebar.radio("Feature importances source :", ('LGBM', 'SHA
                                    help="Feature importances computed from the XGBoost model or from the SHAP values")
 
 # Create tabs
-tab_single, tab_all = st.tabs(["Single customer", "All customers"])
+tab_single, tab_all, tab_inf = st.tabs(["Single customer", "All customers", "Information customers"])
 
 # General tab
+with tab_inf:
+    st.subheader("Informations Gender")
+    df = get_gender().value_counts()
+    df = df.rename('Gender')
+    st.bar_chart(data=df, use_container_width=True)
+    st.write("")
+
+    st.subheader("Informations Age")
+    df1 = get_age()
+    fig, ax = plt.subplots()
+    ax.hist(df1, bins=20)
+    plt.xlabel('AGE', fontsize=12)
+    st.pyplot(fig)
+    st.write("")
+
+    st.subheader("Informations Income")
+    df2 = get_income()
+    fig, ax = plt.subplots()
+    ax.hist(df2, bins=20)
+    plt.xlabel('Income', fontsize=12)
+    st.pyplot(fig)
+    st.write("")
+
+    st.subheader("Informations Income/Age/Gender")
+    df_gender = get_gender()
+    df_age = get_age()
+    df_income = get_income()
+    source = pd.DataFrame(columns=['Gender', 'Income', 'Age'])
+    source['Gender'] = df_gender
+    source['Income'] = df_income
+    source['Age'] = df_age
+    chart = alt.Chart(source).mark_circle().encode(
+        x="Income",
+        y="Age",
+        color="Gender",
+    ).interactive()
+    st.altair_chart(chart, theme="streamlit", use_container_width=True)
+
+    st.subheader("Informations Payment/Age/Gender")
+
+
 with tab_all:
     st.subheader("Feature importances (" + feat_imp_source + ")")
     st.write("")
