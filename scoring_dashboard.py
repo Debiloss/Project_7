@@ -343,8 +343,6 @@ with tab_inf:
     st.line_chart(df_perc)
     st.write("")
 
-    st.subheader("Informations")
-
 
 with tab_all:
     st.subheader("Feature importances (" + feat_imp_source + ")")

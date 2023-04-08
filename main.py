@@ -18,7 +18,7 @@ df_test = pd.read_csv(
     r"C:\Users\Sofia\OneDrive\Documents\OpenClassrooms\Project_7\home-credit-default-risk\application_test.csv")
 
 # Load dataset modifié
-df_test_modif = pd.read_csv(r"C:\Users\Sofia\OneDrive\Documents\OpenClassrooms\Project_7\Python\new_test.csv")
+df_test_modif = pd.read_csv(r"C:\Users\Sofia\OneDrive\Documents\OpenClassrooms\Project_7\Python\data_model_test.csv")
 
 # Load dataset information
 df_test_info = pd.read_csv(r"C:\Users\Sofia\OneDrive\Documents\OpenClassrooms\Project_7\Python\test_info.csv")
@@ -26,8 +26,17 @@ df_test_info = pd.read_csv(r"C:\Users\Sofia\OneDrive\Documents\OpenClassrooms\Pr
 N_CUSTOMERS = 1000
 N_NEIGHBORS = 20
 
-MAIN_COLUMNS_1 = ['SK_ID_CURR', 'CODE_GENDER', 'FLAG_OWN_CAR', 'FLAG_OWN_REALTY', 'CNT_CHILDREN', 'NAME_FAMILY_STATUS',
-                  'NAME_INCOME_TYPE', 'INCOME_CREDIT_PERC', 'ANNUITY_INCOME_PERC', 'DAYS_BIRTH', 'DAYS_EMPLOYED']
+
+MAIN_COLUMNS = ['SK_ID_CURR', 'NAME_INCOME_TYPE', 'NAME_EDUCATION_TYPE',
+                'NAME_FAMILY_STATUS', 'CODE_GENDER', 'AMT_INCOME_TOTAL', 'AMT_CREDIT',
+                'AMT_ANNUITY',
+                'EXT_SOURCE_2', 'EXT_SOURCE_3', 'DAYS_EMPLOYED_PERC',
+                'INCOME_CREDIT_PERC', 'INCOME_PER_PERSON', 'ANNUITY_INCOME_PERC',
+                'PAYMENT_RATE', 'AGE', 'AGE_EMPLOYED']
+
+MAIN_COLUMNS_1 = ['AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY', 'EXT_SOURCE_2', 'EXT_SOURCE_3',
+                  'DAYS_EMPLOYED_PERC', 'INCOME_CREDIT_PERC', 'INCOME_PER_PERSON', 'ANNUITY_INCOME_PERC',
+                  'PAYMENT_RATE', 'AGE', 'AGE_EMPLOYED']
 
 
 col = ['NAME_CONTRACT_TYPE', 'CODE_GENDER', 'FLAG_OWN_CAR',
@@ -166,14 +175,14 @@ def columns(cust_id: int):
     """ Return the customer main columns values """
     if cust_id not in new_test['SK_ID_CURR']:
         raise HTTPException(status_code=404, detail="Customer id not found")
-    cust_main_df = new_test_modif.iloc[cust_id][MAIN_COLUMNS_1]
+    cust_main_df = new_test_info.iloc[cust_id][MAIN_COLUMNS]
     return cust_main_df.to_json()
 
 
 @app.get("/columns/mean")
 def colmuns_mean():
     """ Return the main columns mean values """
-    mean_df = new_test_modif[MAIN_COLUMNS_1].mean()
+    mean_df = new_test_info[MAIN_COLUMNS_1].mean()
     return mean_df.to_json()
 
 
@@ -182,7 +191,7 @@ def colmuns_neighbors(cust_id: int):
     """ Return the 20 nearest neighbors main columns mean values """
     if cust_id not in range(0, N_CUSTOMERS):
         raise HTTPException(status_code=404, detail="Customer id not found")
-    neighbors_df = new_test_modif[MAIN_COLUMNS_1].iloc[neighbors_indices[cust_id]].mean()
+    neighbors_df = new_test_info[MAIN_COLUMNS_1].iloc[neighbors_indices[cust_id]].mean()
     return neighbors_df.to_json()
 
 
