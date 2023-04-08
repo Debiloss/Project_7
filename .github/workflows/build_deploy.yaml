@@ -1,0 +1,16 @@
+name : blogAPI CI/CD
+
+on :
+  push :
+    branches :
+      - "main"
+      - "master"
+
+jobs :
+  build :
+    runs-on : ubuntu-latest
+    step :
+      - name : Push repo
+        uses : action/checkout@v3
+      - name : Print hello
+        run : echo "Hello world"
