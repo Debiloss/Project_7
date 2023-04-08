@@ -11,6 +11,6 @@ jobs :
     runs-on : ubuntu-latest
     steps :
       - name : Push repo
-        uses : Debiloss/Project_7
+        uses : actions/checkout@v3
       - name : Print hello
         run : echo "Hello world"
