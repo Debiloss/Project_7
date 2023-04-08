@@ -9,7 +9,7 @@ on :
 jobs :
   build :
     runs-on : ubuntu-latest
-    step :
+    steps :
       - name : Push repo
         uses : action/checkout@v3
       - name : Print hello
