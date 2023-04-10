@@ -14,7 +14,7 @@ app = FastAPI(
 )
 
 # Load dataset original
-df_test = pd.read_csv("application_test.csv")
+#df_test = pd.read_csv("application_test.csv")
 
 # Load dataset modifié
 df_test_modif = pd.read_csv("data_model_test.csv")
@@ -102,7 +102,7 @@ def prep_data_modif(data, n_neigbhors, n_customers):
 
 
 # Prepare the reduced data and shap values
-new_test = prep_data(df_test, N_CUSTOMERS)
+#new_test = prep_data(df_test, N_CUSTOMERS)
 new_test_modif, neighbors_indices, shap_values = prep_data_modif(df_test_modif, N_NEIGHBORS, N_CUSTOMERS)
 new_test_info = prep_data(df_test_info, N_CUSTOMERS)
 
@@ -120,7 +120,7 @@ def home():
 @app.get('/ids')
 def ids():
     """ Return the customers ids """
-    return {'ids': new_test.head(N_CUSTOMERS).index.to_list()}
+    return {'ids': new_test_modif.head(N_CUSTOMERS).index.to_list()}
 
 
 @app.get('/gender')
@@ -169,7 +169,7 @@ def columns():
 @app.get("/columns/id={cust_id}")
 def columns(cust_id: int):
     """ Return the customer main columns values """
-    if cust_id not in new_test['SK_ID_CURR']:
+    if cust_id not in new_test_info['SK_ID_CURR']:
         raise HTTPException(status_code=404, detail="Customer id not found")
     cust_main_df = new_test_info.iloc[cust_id][MAIN_COLUMNS]
     return cust_main_df.to_json()
