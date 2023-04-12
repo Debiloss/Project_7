@@ -17,10 +17,10 @@ app = FastAPI(
 #df_test = pd.read_csv("application_test.csv")
 
 # Load dataset modifié
-df_test_modif = pd.read_csv("data_model_test.csv")
+df_test_modif = pd.read_csv("./data_model_test.csv")
 
 # Load dataset information
-df_test_info = pd.read_csv("test_info.csv")
+df_test_info = pd.read_csv("./test_info.csv")
 
 N_CUSTOMERS = 1000
 N_NEIGHBORS = 20
@@ -67,13 +67,13 @@ col = ['NAME_CONTRACT_TYPE', 'CODE_GENDER', 'FLAG_OWN_CAR',
 test_columns = df_test_modif.columns
 
 # Load model with pickle
-model = pickle.load(open('best_model.pickle', 'rb'))
+model = pickle.load(open('./best_model.pickle', 'rb'))
 
 # Deserialize SHAP explainer
-explainer = pickle.load(open('lgbm_shap_explainer.pickle', 'rb'))
+explainer = pickle.load(open('./lgbm_shap_explainer.pickle', 'rb'))
 
 # Get datadrift html report
-drift_report = open('data_drift_report.html', 'rb')
+drift_report = open('./data_drift_report.html', 'rb')
 
 
 def prep_data(data, n_customers):
@@ -237,7 +237,7 @@ def datadrift():
 # 5. Run the API with uvicorn
 #    Will run on http://127.0.0.1:8000
 if __name__ == '__main__':
-    uvicorn.run("main:app", host='0.0.0.0', port=8000, reload=True)
+    uvicorn.run("main:app", host='127.0.0.1', port=8000, reload=True)
 
 # tracer la distribution conditionnelle (ceux qui remboursent ou pas) avec filtres sur variables
 # trace une ligne verticale le client que je score afin de voir sa distribution (en fonction voisins)
