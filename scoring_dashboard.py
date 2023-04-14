@@ -431,12 +431,6 @@ with tab_single:
                     The default threshold predict a repay failure when probability is lower or equal to 0.5. \
                     The best optimized threshold predict a repay failure when probability is lower or equal to 0.5")
 
-    target = 1 - get_target()
-    fig, ax = plt.subplots()
-    sns.histplot(target, ax=ax, kde=True)
-    plt.axvline(x=pred_thresh, color='r')
-    plt.axvline(x=predictions, color='purple', linestyle='--')
-    st.pyplot(fig)
 
     # Display shap force plot
     shap_explanation = get_shap_explanation(cust_select_id)
