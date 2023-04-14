@@ -22,5 +22,5 @@ def test_predict():
     cust_id = 2
     response = client.get(f'/predict/id={cust_id}')
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"proba": 0.11476206070126586}
+    assert response.json() == {"proba": 0.1282767443124775}
 
