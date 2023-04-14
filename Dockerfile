@@ -7,6 +7,7 @@ COPY /lgbm_shap_explainer.pickle ./lgbm_shap_explainer.pickle
 COPY /data_drift_report.html ./data_drift_report.html
 COPY /data_model_test.csv ./data_model_test.csv
 COPY /test_info.csv ./test_info.csv
+COPY /main_test.py ./main_test.py
 RUN python3 -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN apt-get update && apt-get install -y libgomp1

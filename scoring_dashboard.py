@@ -8,6 +8,7 @@ import shap
 import requests
 import names
 import json
+import seaborn as sns
 
 # API_URL = 'http://127.0.0.1:8000/'
 API_URL = 'https://apicreditscoring.herokuapp.com/'
@@ -90,6 +91,14 @@ def get_credit_perc():
 def get_income_perc():
     """ Get income perc of customers """
     response = requests.get(API_URL + "income_perc/", timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
+@st.cache_data
+def get_target():
+    """ Get target of customers """
+    response = requests.get(API_URL + "target/", timeout=TIMEOUT)
     content = json.loads(json.loads(response.content))
     return pd.Series(content)
 
@@ -248,19 +257,25 @@ tab_single, tab_all, tab_inf = st.tabs(["Single customer", "All customers", "Inf
 
 # General tab
 with tab_inf:
-    st.subheader("Informations Gender")
+    expander = st.expander("About the customers..")
+    expander.write("Some informations about the Gender and type Education")
+
+    st.subheader("Distribution Gender")
     df = get_gender().value_counts()
     df = df.rename('Gender')
     st.bar_chart(data=df, use_container_width=True)
     st.write("")
 
-    st.subheader("Informations Education")
+    st.subheader("Distribution Education")
     df1 = get_education().value_counts()
     df1 = df1.rename('Education')
     st.bar_chart(data=df1, use_container_width=True)
     st.write("")
 
-    st.subheader("Informations Income/Age/Gender")
+    expander = st.expander("About the customers..")
+    expander.write("Some informations about the Income total and Age per Gender")
+
+    st.subheader("Distribution Income/Age per Gender")
     df_gender = get_gender()
     df_age = get_age()
     df_income = get_income()
@@ -276,7 +291,10 @@ with tab_inf:
     st.altair_chart(chart, theme="streamlit", use_container_width=True)
     st.write("")
 
-    st.subheader("Informations Income/Age/Gender/Education/Payment")
+    expander = st.expander("About the customers..")
+    expander.write("Payment is the variable payment rate. AMT_ANNUITY/AMT_CREDIT")
+
+    st.subheader("Distribution Income/Age per Gender with Education & Payment informations")
     df_gender = get_gender()
     df_age = get_age()
     df_income = get_income()
@@ -330,11 +348,14 @@ with tab_inf:
         .add_selection(click)
     )
 
-    chart = alt.vconcat(points, bars, data=source, title="Information Customers")
+    chart = alt.vconcat(points, bars, data=source)
 
     st.altair_chart(chart, theme="streamlit", use_container_width=True)
 
-    st.subheader("Informations Perc")
+    expander = st.expander("About the customers..")
+    expander.write("Some informations about % variables")
+
+    st.subheader("Informations % variables")
     df_perc = pd.DataFrame(columns=["Income/Credit", "Annuity/Income", "Payment"])
     df_perc["Income/Credit"] = get_credit_perc()
     df_perc["Annuity/Income"] = get_income_perc()
@@ -408,7 +429,13 @@ with tab_single:
     expander.write("The prediction was made using a LGBM classification model.")
     expander.write("The model threshold can be modified in the settings. \
                     The default threshold predict a repay failure when probability is lower or equal to 0.5. \
-                    The best optimized threshold predict a repay failure when probability is lower or equal to 0.31")
+                    The best optimized threshold predict a repay failure when probability is lower or equal to 0.5")
+
+    target = 1 - get_target()
+    sns.histplot(x=target, kde=True)
+    plt.axvline(x=pred_thresh, color='r')
+    plt.axvline(x=predictions, color='purple', linestyle='--')
+    plt.show()
 
     # Display shap force plot
     shap_explanation = get_shap_explanation(cust_select_id)

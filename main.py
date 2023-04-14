@@ -26,7 +26,7 @@ N_CUSTOMERS = 1000
 N_NEIGHBORS = 20
 
 
-MAIN_COLUMNS = ['SK_ID_CURR', 'NAME_INCOME_TYPE', 'NAME_EDUCATION_TYPE',
+MAIN_COLUMNS = ['NAME_INCOME_TYPE', 'NAME_EDUCATION_TYPE',
                 'NAME_FAMILY_STATUS', 'CODE_GENDER', 'AMT_INCOME_TOTAL', 'AMT_CREDIT',
                 'AMT_ANNUITY',
                 'EXT_SOURCE_2', 'EXT_SOURCE_3', 'DAYS_EMPLOYED_PERC',
@@ -92,7 +92,7 @@ def prep_data_modif(data, n_neigbhors, n_customers):
     _, neighbors_indices = neighbors.kneighbors(df)
 
     # Compute shap values
-    df1 = df.drop(axis=1, columns=['SK_ID_CURR'])
+    df1 = data.drop(axis=1, columns=['SK_ID_CURR'])
     shap_values = explainer(df1)
 
     # Create new df
@@ -165,6 +165,12 @@ def columns():
     return new_test_info["ANNUITY_INCOME_PERC"].head(N_CUSTOMERS).to_json()
 
 
+@app.get('/target')
+def columns():
+    """ Return target (conditionnal probability) """
+    return df_test_info["TARGET"].to_json()
+
+
 # Retourne un tableau avec les colonnes principales pour un client donné
 @app.get("/columns/id={cust_id}")
 def columns(cust_id: int):
@@ -207,7 +213,7 @@ def explain_all():
     """ Return all shap values """
     return {'values': shap_values.values.tolist(),
             'base_values': shap_values.base_values.tolist(),
-            'features': explainer.feature_names}
+            'features': shap_values.feature_names}
 
 
 @app.get("/shap/id={cust_id}")
@@ -217,7 +223,7 @@ def explain(cust_id: int):
         raise HTTPException(status_code=404, detail="Customer id not found")
     return {'values': shap_values[cust_id].values.tolist(),
             'base_values': float(shap_values[cust_id].base_values),
-            'features': explainer.feature_names}
+            'features': shap_values.feature_names}
 
 
 @app.get("/importances")
@@ -251,3 +257,7 @@ if __name__ == '__main__':
 # création pipeline et faire des tests unitaires : fichier YML permet de lancer les commandes de l'API
 # git hub action
 # https://github.com/marketplace/actions/deploy-to-heroku : creation du .yaml pour le déploiement sur heroku
+
+# Mlflow
+# ppt + note meto
+# test auto + maj dashboard
