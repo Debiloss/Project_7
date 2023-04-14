@@ -124,49 +124,49 @@ def ids():
 
 
 @app.get('/gender')
-def columns():
+def gender():
     """ Return the customers gender """
     return new_test_info["CODE_GENDER"].head(N_CUSTOMERS).to_json()
 
 
 @app.get('/education')
-def columns():
+def education():
     """ Return the customers gender """
     return new_test_info["NAME_EDUCATION_TYPE"].head(N_CUSTOMERS).to_json()
 
 
 @app.get('/age')
-def columns():
+def age():
     """ Return the customers age """
     return new_test_info["AGE"].head(N_CUSTOMERS).to_json()
 
 
 @app.get('/income')
-def columns():
+def income():
     """ Return the customers income total """
     return new_test_info["AMT_INCOME_TOTAL"].head(N_CUSTOMERS).to_json()
 
 
 @app.get('/payment')
-def columns():
+def payment():
     """ Return the customers payment rate """
     return new_test_info["PAYMENT_RATE"].head(N_CUSTOMERS).to_json()
 
 
 @app.get('/credit_perc')
-def columns():
+def credit_perc():
     """ Return the customers income credit percent """
     return new_test_info["INCOME_CREDIT_PERC"].head(N_CUSTOMERS).to_json()
 
 
 @app.get('/income_perc')
-def columns():
+def income_perc():
     """ Return the customers income credit percent """
     return new_test_info["ANNUITY_INCOME_PERC"].head(N_CUSTOMERS).to_json()
 
 
 @app.get('/target')
-def columns():
+def target():
     """ Return target (conditionnal probability) """
     return df_test_info["TARGET"].to_json()
 
