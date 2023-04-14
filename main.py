@@ -245,19 +245,6 @@ def datadrift():
 if __name__ == '__main__':
     uvicorn.run("main:app", host='127.0.0.1', port=8000, reload=True)
 
-# tracer la distribution conditionnelle (ceux qui remboursent ou pas) avec filtres sur variables
-# trace une ligne verticale le client que je score afin de voir sa distribution (en fonction voisins)
-# sur la distribution indiquer sa localisation sur la distribution
-# prédictions, probabilité de rembourser, le seuil de probabilités
-# interprétabilité local et global
-#
-# finir le déploiement et ajout URL de l'API sur le dashboard
-# et deploiement sur la communauté de streamlit
-# https://www.youtube.com/watch?v=HKoOBiAaHGg
-# création pipeline et faire des tests unitaires : fichier YML permet de lancer les commandes de l'API
-# git hub action
-# https://github.com/marketplace/actions/deploy-to-heroku : creation du .yaml pour le déploiement sur heroku
 
 # Mlflow
 # ppt + note meto
-# test auto + maj dashboard
