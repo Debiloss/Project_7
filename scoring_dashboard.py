@@ -241,7 +241,7 @@ shap_plot_type = st.sidebar.radio("Select the plot type :", ('Waterfall', 'Bar')
                                   help="Type of plot for the SHAP explanation")
 # Select source of feature importance
 feat_imp_source = st.sidebar.radio("Feature importances source :", ('LGBM', 'SHAP'),
-                                   help="Feature importances computed from the XGBoost model or from the SHAP values")
+                                   help="Feature importances computed from the LGBM model or from the SHAP values")
 
 # Create tabs
 tab_single, tab_all, tab_inf = st.tabs(["Single customer", "All customers", "Information customers"])
