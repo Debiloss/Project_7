@@ -24,4 +24,3 @@ def test_predict():
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {"proba": 0.11476206070126586}
 
-# postdeploy: heroku run pytest
