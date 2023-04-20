@@ -112,6 +112,15 @@ def get_cust_columns(cust_id):
     return pd.Series(content)
 
 
+# Retourne une colonne pour un client donné
+@st.cache_data
+def get_value_columns(cust_col):
+    """ Get customer columns """
+    response = requests.get(API_URL + "columns/col=" + str(cust_col), timeout=TIMEOUT)
+    content = json.loads(json.loads(response.content))
+    return pd.Series(content)
+
+
 @st.cache_data
 def get_columns_mean():
     """ Get customers main columns mean values """
@@ -171,6 +180,7 @@ def get_feature_importances():
 
 
 # Retourne les importances locales des variables en fonction du modele utilisé pour la prédiction
+@st.cache_data
 def model_importances_chart():
     """ Return altair chart of feature importances """
     imp_df = get_feature_importances()
@@ -181,7 +191,7 @@ def model_importances_chart():
     return imp_chart
 
 
-# 
+#
 def st_shap(plot, height=None):
     """ Create a shap html component """
     shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
@@ -243,7 +253,7 @@ st.markdown(f""" <style>
 # Settings on sidebar
 st.sidebar.subheader("Settings")
 # Select the prediction threshold
-pred_thresh = st.sidebar.slider("Prediction threshold : ", 0.15, 0.55, value=0.50, step=0.01,
+pred_thresh = st.sidebar.slider("Prediction threshold : ", 0.15, 0.80, value=0.52, step=0.01,
                                 help="Threshold of the prediction for class 1 : repay failure (standard=0.5)")
 # Select type of explanation
 shap_plot_type = st.sidebar.radio("Select the plot type :", ('Waterfall', 'Bar'),
@@ -305,7 +315,7 @@ with tab_inf:
     source['Income'] = df_income
     source['Age'] = df_age
     source['Education'] = df_education
-    source['Payment'] = df_payment*5
+    source['Payment'] = df_payment
 
     scale = alt.Scale(
         domain=["M", "F"],
@@ -429,8 +439,24 @@ with tab_single:
     expander.write("The prediction was made using a LGBM classification model.")
     expander.write("The model threshold can be modified in the settings. \
                     The default threshold predict a repay failure when probability is lower or equal to 0.5. \
-                    The best optimized threshold predict a repay failure when probability is lower or equal to 0.5")
+                    The best optimized threshold predict a repay failure when probability is lower or equal to 0.52")
 
+    # Display prediction
+    st.subheader("Customer distribution")
+    columns = ['AMT_INCOME_TOTAL', 'AMT_CREDIT', 'EXT_SOURCE_2', 'EXT_SOURCE_3', 'AGE', 'PROBA']
+    # Barre déroulante pour choisir une colonne
+    selected_col = st.selectbox('Choisissez une colonne', columns)
+    df_value = pd.DataFrame(get_value_columns(selected_col))
+    df_pers = pd.DataFrame(get_cust_columns(cust_select_id))
+
+    fig, ax = plt.subplots()
+    sns.histplot(df_value[0], color='limegreen', kde=True)
+    if selected_col == 'PROBA':
+        ax.axvline(pred_thresh, color='r', linestyle='solid', linewidth=2)
+    ax.axvline(df_pers.loc[selected_col, 0], color='darkviolet', linestyle='dashed', linewidth=2)
+    ax.set_xlabel(selected_col)
+    ax.set_ylabel('Count')
+    st.pyplot(fig)
 
     # Display shap force plot
     shap_explanation = get_shap_explanation(cust_select_id)

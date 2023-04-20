@@ -13,8 +13,6 @@ app = FastAPI(
     description="Une API renvoyant une prédiction basé sur un modèle de scoring",
 )
 
-# Load dataset original
-#df_test = pd.read_csv("application_test.csv")
 
 # Load dataset modifié
 df_test_modif = pd.read_csv("./data_model_test.csv")
@@ -28,14 +26,14 @@ N_NEIGHBORS = 20
 
 MAIN_COLUMNS = ['NAME_INCOME_TYPE', 'NAME_EDUCATION_TYPE',
                 'NAME_FAMILY_STATUS', 'CODE_GENDER', 'AMT_INCOME_TOTAL', 'AMT_CREDIT',
-                'AMT_ANNUITY',
-                'EXT_SOURCE_2', 'EXT_SOURCE_3', 'DAYS_EMPLOYED_PERC',
+                'AMT_ANNUITY','EXT_SOURCE_2', 'EXT_SOURCE_3', 'DAYS_EMPLOYED_PERC',
                 'INCOME_CREDIT_PERC', 'INCOME_PER_PERSON', 'ANNUITY_INCOME_PERC',
-                'PAYMENT_RATE', 'AGE', 'AGE_EMPLOYED']
+                'PAYMENT_RATE', 'AGE', 'AGE_EMPLOYED', 'PROBA', 'TARGET',
+                'FLAG_DOCUMENT_2', 'FLAG_DOCUMENT_3']
 
 MAIN_COLUMNS_1 = ['AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY', 'EXT_SOURCE_2', 'EXT_SOURCE_3',
                   'DAYS_EMPLOYED_PERC', 'INCOME_CREDIT_PERC', 'INCOME_PER_PERSON', 'ANNUITY_INCOME_PERC',
-                  'PAYMENT_RATE', 'AGE', 'AGE_EMPLOYED']
+                  'PAYMENT_RATE', 'AGE', 'AGE_EMPLOYED', 'PROBA', 'TARGET', 'FLAG_DOCUMENT_2', 'FLAG_DOCUMENT_3']
 
 
 col = ['NAME_CONTRACT_TYPE', 'CODE_GENDER', 'FLAG_OWN_CAR',
@@ -43,7 +41,7 @@ col = ['NAME_CONTRACT_TYPE', 'CODE_GENDER', 'FLAG_OWN_CAR',
        'INCOME_PER_PERSON', 'ANNUITY_INCOME_PERC', 'PAYMENT_RATE',
        'AMT_GOODS_PRICE', 'NAME_TYPE_SUITE', 'NAME_INCOME_TYPE',
        'NAME_EDUCATION_TYPE', 'NAME_FAMILY_STATUS', 'NAME_HOUSING_TYPE',
-       'REGION_POPULATION_RELATIVE', 'DAYS_BIRTH', 'DAYS_EMPLOYED',
+       'REGION_POPULATION_RELATIVE', 'AGE',
        'DAYS_REGISTRATION', 'DAYS_ID_PUBLISH', 'FLAG_MOBIL', 'FLAG_EMP_PHONE',
        'FLAG_WORK_PHONE', 'FLAG_CONT_MOBILE', 'FLAG_PHONE', 'FLAG_EMAIL',
        'OCCUPATION_TYPE', 'REGION_RATING_CLIENT',
@@ -64,7 +62,6 @@ col = ['NAME_CONTRACT_TYPE', 'CODE_GENDER', 'FLAG_OWN_CAR',
        'AMT_REQ_CREDIT_BUREAU_WEEK', 'AMT_REQ_CREDIT_BUREAU_MON',
        'AMT_REQ_CREDIT_BUREAU_QRT', 'AMT_REQ_CREDIT_BUREAU_YEAR']
 
-test_columns = df_test_modif.columns
 
 # Load model with pickle
 model = pickle.load(open('./best_model.pickle', 'rb'))
@@ -92,7 +89,7 @@ def prep_data_modif(data, n_neigbhors, n_customers):
     _, neighbors_indices = neighbors.kneighbors(df)
 
     # Compute shap values
-    df1 = df.drop(axis=1, columns=['SK_ID_CURR'])
+    df1 = df.drop(axis=1, columns=['SK_ID_CURR', 'TARGET', 'PROBA'])
     shap_values = explainer(df1)
 
     # Create new df
@@ -165,6 +162,11 @@ def columns():
     return new_test_info["ANNUITY_INCOME_PERC"].head(N_CUSTOMERS).to_json()
 
 
+@app.get('/target')
+def columns():
+    """ Return the customers income credit percent """
+    return new_test_info["PROBA"].to_json()
+
 
 # Retourne un tableau avec les colonnes principales pour un client donné
 @app.get("/columns/id={cust_id}")
@@ -174,6 +176,16 @@ def columns(cust_id: int):
         raise HTTPException(status_code=404, detail="Customer id not found")
     cust_main_df = new_test_info.iloc[cust_id][MAIN_COLUMNS]
     return cust_main_df.to_json()
+
+
+# Retourne un tableau avec les données des clients pour une colonne donné
+@app.get("/columns/col={cust_col}")
+def columns_value(cust_col: str):
+    """ Return one columns values """
+    if cust_col not in new_test_info[MAIN_COLUMNS].columns:
+        raise HTTPException(status_code=404, detail="Columns not found")
+    cust_df = new_test_info[cust_col]
+    return cust_df.to_json()
 
 
 @app.get("/columns/mean")
@@ -241,5 +253,7 @@ if __name__ == '__main__':
     uvicorn.run("main:app", host='127.0.0.1', port=8000, reload=True)
 
 
-# Mlflow
-# ppt + note meto
+# Mlflow comment ça fonctionne
+# Git dossier versioning de code
+# variable shap
+# ppt + note meto + analyse datadrift
