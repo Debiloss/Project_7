@@ -89,7 +89,7 @@ def prep_data_modif(data, n_neigbhors, n_customers):
     _, neighbors_indices = neighbors.kneighbors(df)
 
     # Compute shap values
-    df1 = data.drop(axis=1, columns=['SK_ID_CURR', 'TARGET', 'PROBA'])
+    df1 = df.drop(axis=1, columns=['SK_ID_CURR', 'TARGET', 'PROBA'])
     shap_values = explainer(df1)
 
     # Create new df
