@@ -26,7 +26,7 @@ N_NEIGHBORS = 20
 
 MAIN_COLUMNS = ['NAME_INCOME_TYPE', 'NAME_EDUCATION_TYPE',
                 'NAME_FAMILY_STATUS', 'CODE_GENDER', 'AMT_INCOME_TOTAL', 'AMT_CREDIT',
-                'AMT_ANNUITY','EXT_SOURCE_2', 'EXT_SOURCE_3', 'DAYS_EMPLOYED_PERC',
+                'AMT_ANNUITY', 'EXT_SOURCE_2', 'EXT_SOURCE_3', 'DAYS_EMPLOYED_PERC',
                 'INCOME_CREDIT_PERC', 'INCOME_PER_PERSON', 'ANNUITY_INCOME_PERC',
                 'PAYMENT_RATE', 'AGE', 'AGE_EMPLOYED', 'PROBA', 'TARGET',
                 'FLAG_DOCUMENT_2', 'FLAG_DOCUMENT_3']
@@ -75,14 +75,14 @@ drift_report = open('./data_drift_report.html', 'rb')
 
 def prep_data(data, n_customers):
     """Mise en forme de la data à exploiter"""
-    df = data.iloc[0:n_customers]
+    df = data.iloc[n_customers:2*n_customers]
 
     return df
 
 
 def prep_data_modif(data, n_neigbhors, n_customers):
     """Mise en forme de la data à exploiter"""
-    df = data.iloc[0:n_customers]
+    df = data.iloc[n_customers:2*n_customers]
 
     # Find nearest neighbors
     neighbors = NearestNeighbors(n_neighbors=n_neigbhors, algorithm='ball_tree').fit(df)
@@ -99,7 +99,6 @@ def prep_data_modif(data, n_neigbhors, n_customers):
 
 
 # Prepare the reduced data and shap values
-#new_test = prep_data(df_test, N_CUSTOMERS)
 new_test_modif, neighbors_indices, shap_values = prep_data_modif(df_test_modif, N_NEIGHBORS, N_CUSTOMERS)
 new_test_info = prep_data(df_test_info, N_CUSTOMERS)
 
@@ -251,9 +250,3 @@ def datadrift():
 #    Will run on http://127.0.0.1:8000
 if __name__ == '__main__':
     uvicorn.run("main:app", host='127.0.0.1', port=8000, reload=True)
-
-
-# Mlflow comment ça fonctionne
-# Git dossier versioning de code
-# variable shap
-# ppt + note meto + analyse datadrift
