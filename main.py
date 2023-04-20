@@ -75,21 +75,21 @@ drift_report = open('./data_drift_report.html', 'rb')
 
 def prep_data(data, n_customers):
     """Mise en forme de la data à exploiter"""
-    df = data.iloc[n_customers:2*n_customers].reset_index(drop=True)
+    df = data.iloc[0:n_customers].reset_index(drop=True)
 
     return df
 
 
 def prep_data_modif(data, n_neigbhors, n_customers):
     """Mise en forme de la data à exploiter"""
-    df = data.iloc[n_customers:2*n_customers].reset_index(drop=True)
+    df = data.iloc[0:n_customers].reset_index(drop=True)
 
     # Find nearest neighbors
     neighbors = NearestNeighbors(n_neighbors=n_neigbhors, algorithm='ball_tree').fit(df)
     _, neighbors_indices = neighbors.kneighbors(df)
 
     # Compute shap values
-    df1 = df.drop(axis=1, columns=['SK_ID_CURR', 'TARGET', 'PROBA'])
+    df1 = data.drop(axis=1, columns=['SK_ID_CURR', 'TARGET', 'PROBA'])
     shap_values = explainer(df1)
 
     # Create new df
